@@ -7,7 +7,7 @@ Hint :
     
     - Parse the whole dataset and initialize the landmarks by using at least 3 range observations with the proper parallax
     - Setup a LS optimization that involves all the poses and landmarks that you have initialized
-    - In the range edges the ID of the landmarkd is reported, use it to identify them for both the initialization and the global optimization
+    - In the range edges the ID of the landmarks is reported, use it to identify them for both the initialization and the global optimization
          
         -EDGE_RANGE_SE2_XY id_pose id_landmark range
 
