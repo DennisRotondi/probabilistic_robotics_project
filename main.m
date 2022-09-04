@@ -17,9 +17,8 @@ plot_trajectories(poses,poses_est,posesg)
 plot_maps(landmarks,landmarks_est,landmarksg)
 
 [poses_est, landmarks_est] = least_square_partial_knowledge(landmarks, poses, transitions, observations, id_to_landmark, niterations,posesg);
-# then we finally plot the results
 plot_trajectories(poses,poses_est,posesg)
 plot_maps(landmarks,landmarks_est,landmarksg)
 
-disp("press a key to end the program")
+disp("figures 3,4 are with partial knowledge, press a key to end the program")
 pause

@@ -1,7 +1,7 @@
 function [poses_est, landmarks_est] = least_square_partial_knowledge(landmarks, poses, transitions, observations, id_to_landmark, niterations, posesg)
     allp= prod(size((poses)));
     dim = allp+prod(size((landmarks)));
-    poses(:,1:3)=posesg(:,1:3); #NOW WE FIX 3 POINTS SINCE THE PROBLEM AS IT IS HAS 6DOF
+    poses(:,1:3)=posesg(:,1:3); #NOW WE FIX 3 POINTS SINCE THE PROBLEM AS IT IS HAS 3DOF (from 2d rigid transform)
     for iteration=1:niterations
         H=zeros(dim,dim);  b=zeros(dim,1); %accumulators for H and b
         chi_tot=0; %cumulative chi2
