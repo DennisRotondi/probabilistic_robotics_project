@@ -10,10 +10,16 @@ landmarksg = reshape(cell2mat(struct2cell(landmarksg)(2:end, :, :)), 2, []);
 # then after init guess use trasition as pose-pose constraint and observations as pose-landmarks positions.
 [landmarks, id_to_landmark, landmark_to_id] = compute_initial_guess(poses, observations);
 # now that we have the landmarks and the relative associations we can solve the least square problem
-niterations = 28;
+niterations = 26
 [poses_est, landmarks_est] = least_square(landmarks, poses, transitions, observations, id_to_landmark, niterations);
 # then we finally plot the results
 plot_trajectories(poses,poses_est,posesg)
 plot_maps(landmarks,landmarks_est,landmarksg)
+
+[poses_est, landmarks_est] = least_square_partial_knowledge(landmarks, poses, transitions, observations, id_to_landmark, niterations,posesg);
+# then we finally plot the results
+plot_trajectories(poses,poses_est,posesg)
+plot_maps(landmarks,landmarks_est,landmarksg)
+
 disp("press a key to end the program")
-pause(20)
+pause
