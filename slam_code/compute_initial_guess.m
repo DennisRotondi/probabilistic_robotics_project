@@ -1,7 +1,6 @@
 # in our problem we do not have landmarks positions, we need to solve 
 # a data reconciliation problem so to have a good initial guess. I'll
 # solve a linear system exploiting the range of the measurements we have.
-
 # https://en.wikipedia.org/wiki/True-range_multilateration
 # first we need to find at least three observations i,j,k for each landmark (x y)'
 # di^2 = (xi-x)^2+(yi-y)^2
@@ -15,49 +14,48 @@
 # if we have n>3 points: we can substract each i = 1,2,...,n-1 equation with
 # j = i+1,i+2,..,n and stack them in matrix A so to have a multiple regression. 
 # Note that in this case we have n*(n-1)/2 equations --> overdetermined system 
-# that admit a pseudoinverse solution i.e. (x y)' = pinv(A)*d
+# that admits a pseudoinverse solution i.e. (x y)' = pinv(A)*d
 
 function [landmarks, id_to_landmark, landmark_to_id] = compute_initial_guess(poses, observations)
     landmarks = [];
     # since we do not know how many landmarks we will observe, we allocate a large enough buffer (they are less than 100)
-    id_to_landmark = ones(100, 1)*-1;
-    landmark_to_id = ones(100, 1)*-1;
+    id_to_landmark = ones(100, 1) * -1;
+    landmark_to_id = ones(100, 1) * -1;
     obs_foreach_land = cell;
     num_land = 0;
-    # here we build the vector xi yi di for each pose that observe the landmark, so to use the regressor
-
-    # these ids have less than 3 observations, we won't initialize them, just to efficiency reason 
+    # these ids have less than 3 observations, we won't initialize them, just for efficiency reasons 
     # I put them in a constant array, to find them just check the columns of obs_foreach
     id_toskip = [62]; 
+    # here we build the vector xi yi di for each pose that observe the landmark to use the regressor
     for i = 1:length(observations)
         obs = observations(i);
-        pose_id = obs.pose_id-1099; # this is a simple conversion I've found checking the datas
-        for m =1:length(obs.observation)
+        pose_id = obs.pose_id - 1099; # this is a simple conversion I've found checking the datas
+        for m = 1:length(obs.observation)
             sob = obs.observation(m);
             id = sob.id;
             d = sob.bearing;
-            if id_to_landmark(id)<0
+            if id_to_landmark(id) < 0
                 if ismember(id, id_toskip) > 0
                     continue
                 endif
                 new_id = ++num_land;
-                id_to_landmark(id)=new_id;
-                landmark_to_id(new_id)=id;
-                obs_foreach_land{new_id}=[];
+                id_to_landmark(id) = new_id;
+                landmark_to_id(new_id) = id;
+                obs_foreach_land{new_id} = [];
             endif
             land_id = id_to_landmark(id);
-            obs_foreach_land{land_id}(:,end+1) = [poses(1:2,pose_id); d];
+            obs_foreach_land{land_id}(:, end+1) = [poses(1:2, pose_id); d];
         endfor
     endfor
     # now we solve the regression problem for each landmark
     % disp(size(obs_foreach_land))
     for n = 1:length(obs_foreach_land)
         lobs = obs_foreach_land{n};
-        if columns(lobs)<3
+        if columns(lobs) < 3
             disp("less than 3 obs for landmark")
             disp(landmark_to_id(n))
             # landmark with id 62 is the only one
-        end
+        endif
         % disp(size(lobs))
         % disp(n)
         A = [];
@@ -72,6 +70,6 @@ function [landmarks, id_to_landmark, landmark_to_id] = compute_initial_guess(pos
                 A(end+1, :) = A_;
             endfor
         endfor    
-        landmarks(:, end+1) = (pinv(A)*b');
+        landmarks(:, end+1) = pinv(A) * b';
     endfor
 endfunction
